@@ -24,8 +24,10 @@ def main():
     train_data = CIFAR10(root='./data/train', train=True, transform=ToTensor(), download=True)
     test_data = CIFAR10(root='./data/test', train=True, transform=ToTensor(), download=True)
     print("DOWNLOAD FINISHED!")
+    print("DISTRIBUTING DATA STARTED!")
     save_dataset(train_data, path='./data/json/train')
     save_dataset(test_data, path='./data/json/test')
+    print("DISTRIBUTING DATA ENDED!")
 
 
 if __name__ == '__main__':
