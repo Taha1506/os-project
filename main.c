@@ -29,15 +29,19 @@ void** read_weights(const char* path) {
     root = json_loads(json_content, 0, &error);
     free(json_content);
 
-    void** ans [10];
+    void** ans = (void*)calloc(sizeof(void*), 10);
 
 
     // Retrieve values by key
     json_t *value = json_object_get(root, "conv1.weight");
-    float conv1_weight[6][3][5][5];
+//    float conv1_weight[6][3][5][5];
+    float**** conv1_weight = calloc(sizeof(float***), 6);
     for (int i = 0; i < 6; i++) {
+        conv1_weight[i] = calloc(sizeof(float**), 3);
         for (int j = 0; j < 3; j++) {
+            conv1_weight[i][j] = calloc(sizeof(float*), 5);
             for (int k = 0; k < 5; k++) {
+                conv1_weight[i][j][k] = calloc(sizeof(float), 5);
                 for (int r = 0; r < 5; r++) {
                     json_t *element = json_array_get(json_array_get(json_array_get(json_array_get(value, i), j), k), r);
                     conv1_weight[i][j][k][r] = json_real_value(element);
@@ -45,10 +49,11 @@ void** read_weights(const char* path) {
             }
         }
     }
-    ans[0]  = conv1_weight;
+    ans[0] = conv1_weight;
+
 
     value = json_object_get(root, "conv1.bias");
-    float conv1_bias[6];
+    float* conv1_bias = calloc(sizeof(float), 6);
     for (int i = 0; i < 6; i++) {
         json_t *element = json_array_get(value, i);
         conv1_bias[i] = json_real_value(element);
@@ -56,10 +61,13 @@ void** read_weights(const char* path) {
     ans[1] = conv1_bias;
 
     value = json_object_get(root, "conv2.weight");
-    float conv2_weight[16][6][5][5];
+    float**** conv2_weight = calloc(sizeof(float***), 16);
     for (int i = 0; i < 16; i++) {
+        conv2_weight[i] = calloc(sizeof(float**), 6);
         for (int j = 0; j < 6; j++) {
+            conv2_weight[i][j] = calloc(sizeof(float*), 5);
             for (int k = 0; k < 5; k++) {
+                conv2_weight[i][j][k] = calloc(sizeof(float), 5);
                 for (int r = 0; r < 5; r++) {
                     json_t *element = json_array_get(json_array_get(json_array_get(json_array_get(value, i), j), k), r);
                     conv2_weight[i][j][k][r] = json_real_value(element);
@@ -70,7 +78,7 @@ void** read_weights(const char* path) {
     ans[2] = conv2_weight;
 
     value = json_object_get(root, "conv2.bias");
-    float conv2_bias[16];
+    float* conv2_bias = calloc(sizeof(float), 16);
     for (int i = 0; i < 16; i++) {
         json_t *element = json_array_get(value, i);
         conv2_bias[i] = json_real_value(element);
@@ -78,8 +86,9 @@ void** read_weights(const char* path) {
     ans[3] = conv2_bias;
 
     value = json_object_get(root, "fc1.weight");
-    float fc1_weight[120][400];
+    float** fc1_weight = calloc(sizeof(float*), 120);
     for (int i = 0; i < 120; i++) {
+        fc1_weight[i] = calloc(sizeof(float), 400);
         for (int j = 0; j < 400; j++) {
             json_t *element = json_array_get(json_array_get(value, i), j);
             fc1_weight[i][j] = json_real_value(element);
@@ -87,8 +96,9 @@ void** read_weights(const char* path) {
     }
     ans[4] = fc1_weight;
 
+
     value = json_object_get(root, "fc1.bias");
-    float fc1_bias[120];
+    float* fc1_bias = calloc(sizeof(float), 120);
     for (int i = 0; i < 120; i++) {
         json_t *element = json_array_get(value, i);
         fc1_bias[i] = json_real_value(element);
@@ -96,8 +106,9 @@ void** read_weights(const char* path) {
     ans[5] = fc1_bias;
 
     value = json_object_get(root, "fc2.weight");
-    float fc2_weight[84][120];
+    float** fc2_weight = calloc(sizeof(float*), 84);
     for (int i = 0; i < 84; i++) {
+        fc2_weight[i] = calloc(sizeof(float), 120);
         for (int j = 0; j < 120; j++) {
             json_t *element = json_array_get(json_array_get(value, i), j);
             fc2_weight[i][j] = json_real_value(element);
@@ -106,7 +117,7 @@ void** read_weights(const char* path) {
     ans[6] = fc2_weight;
 
     value = json_object_get(root, "fc2.bias");
-    float fc2_bias[84];
+    float* fc2_bias = calloc(sizeof(float), 84);
     for (int i = 0; i < 84; i++) {
         json_t *element = json_array_get(value, i);
         fc2_bias[i] = json_real_value(element);
@@ -114,8 +125,9 @@ void** read_weights(const char* path) {
     ans[7] = fc2_bias;
 
     value = json_object_get(root, "fc3.weight");
-    float fc3_weight[10][84];
+    float** fc3_weight = calloc(sizeof(float*), 10);
     for (int i = 0; i < 10; i++) {
+        fc3_weight[i] = calloc(sizeof(float), 84);
         for (int j = 0; j < 84; j++) {
             json_t *element = json_array_get(json_array_get(value, i), j);
             fc3_weight[i][j] = json_real_value(element);
@@ -124,7 +136,7 @@ void** read_weights(const char* path) {
     ans[8] = fc3_weight;
 
     value = json_object_get(root, "fc3.bias");
-    float fc3_bias[10];
+    float* fc3_bias = calloc(sizeof(float), 10);
     for (int i = 0; i < 10; i++) {
         json_t *element = json_array_get(value, i);
         fc3_bias[i] = json_real_value(element);
@@ -133,53 +145,52 @@ void** read_weights(const char* path) {
     return ans;
 }
 
-void** average_weights() {
-    void*** aggregated_weights[10];
+void average_weights() {
+    void** aggregated_weights[10];
     for (int i = 0; i < 10; i++) {
-        char* path[100];
-        path = "model_weights/weights"
+        char path[100];
+        strcpy(path, "model_weights/weights");
         sprintf(path, "%s%d", path, i);
         aggregated_weights[i] = read_weights(path);
     }
     json_t *root = json_object();
 
+
     float conv1_weight[6][3][5][5];
-    json_t* first_layer = json_array();
+    json_t* conv1_weight_first_layer = json_array();
     for (int i = 0; i < 6; i++) {
-        json_t* second_layer = json_array();
+        json_t* conv1_weight_second_layer = json_array();
         for (int j = 0; j < 3; j++) {
-            json_t third_layer = json_array();
+            json_t* conv1_weight_third_layer = json_array();
             for (int k = 0; k < 5; k++) {
-                json_t forth_layer = json_array()
+                json_t* conv1_weight_forth_layer = json_array();
                 for (int r = 0; r < 5; r++) {
                     conv1_weight[i][j][k][r] = 0;
                     for (int p = 0; p < 10; p++) {
-                        conv1_weight[i][j][k][r] += aggregated_weights[p][0][i][j][k][r];
+                        conv1_weight[i][j][k][r] += ((float****)aggregated_weights[p][0])[i][j][k][r];
                     }
                     conv1_weight[i][j][k][r] /= 10;
-                    json_array_append(forth_layer, json_real(conv1_weight[i][j][k][r]));
+                    json_array_append(conv1_weight_forth_layer, json_real(conv1_weight[i][j][k][r]));
                 }
-                json_array_append(third_layer, forth_layer);
+                json_array_append(conv1_weight_third_layer, conv1_weight_forth_layer);
             }
-            json_array_append(second_layer, third_layer);
+            json_array_append(conv1_weight_second_layer, conv1_weight_third_layer);
         }
-        json_array_append(first_layer, second_layer);
+        json_array_append(conv1_weight_first_layer, conv1_weight_second_layer);
     }
-    result[0] = conv1_weight;
-    json_object_set(root, "conv1.weight", first_layer);
+    json_object_set(root, "conv1.weight", conv1_weight_first_layer);
+
 
     float conv1_bias[6];
     json_t* conv1_bias_first_layer = json_array();
     for (int i = 0; i < 6; i++) {
         conv1_bias[i] = 0;
         for (int p = 0; p < 10; p++) {
-            conv1_bias[i] += aggregated_weights[p][1][i];
+            conv1_bias[i] += ((float*)aggregated_weights[p][1])[i];
         }
-        conv1_bias[i] /= 10
+        conv1_bias[i] /= 10;
         json_array_append(conv1_bias_first_layer, json_real(conv1_bias[i]));
     }
-
-    result[1] = conv1_bias;
     json_object_set(root, "conv1.bias", conv1_bias_first_layer);
 
     float conv2_weight[16][6][5][5];
@@ -193,7 +204,7 @@ void** average_weights() {
                 for (int r = 0; r < 5; r++) {
                     conv2_weight[i][j][k][r] = 0;
                     for (int p = 0; p < 10; p++) {
-                        conv2_weight[i][j][k][r] += aggregated_weights[p][2][i][j][k][r];
+                        conv2_weight[i][j][k][r] += ((float****)aggregated_weights[p][2])[i][j][k][r];
                     }
                     conv2_weight[i][j][k][r] /= 10;
                     json_array_append(conv2_weight_forth_layer, json_real(conv2_weight[i][j][k][r]));
@@ -207,7 +218,6 @@ void** average_weights() {
         json_array_append(conv2_weight_first_layer, conv2_weight_second_layer);
 
     }
-    result[2] = conv2_weight;
     json_object_set(root, "conv2.weight", conv2_weight_first_layer);
 
 
@@ -216,12 +226,11 @@ void** average_weights() {
     for (int i = 0; i < 16; i++) {
         conv2_bias[i] = 0;
         for (int p = 0; p < 10; p++) {
-            conv2_bias[i] += aggregated_weights[p][3][i];
+            conv2_bias[i] += ((float*)aggregated_weights[p][3])[i];
         }
         conv2_bias[i] /= 10;
         json_array_append(conv2_bias_first_layer, json_real(conv2_bias[i]));
     }
-    result[3] = conv2_bias;
     json_object_set(root, "conv2.bias", conv2_bias_first_layer);
 
 
@@ -232,14 +241,13 @@ void** average_weights() {
         for (int j = 0; j < 400; j++) {
             fc1_weight[i][j] = 0;
             for (int p = 0; p < 10; p++) {
-                fc1_weight[i][j] += aggregated_weights[p][4][i][j];
+                fc1_weight[i][j] += ((float**)aggregated_weights[p][4])[i][j];
             }
             fc1_weight[i][j] /= 10;
             json_array_append(fc1_weight_second_layer, json_real(fc1_weight[i][j]));
         }
-        json_array_append(fc1_weight_first_layer, fc1_weight_second_layer)
+        json_array_append(fc1_weight_first_layer, fc1_weight_second_layer);
     }
-    result[4] = fc1_weight;
     json_object_set(root, "fc1.weight", fc1_weight_first_layer);
 
 
@@ -249,12 +257,11 @@ void** average_weights() {
     for (int i = 0; i < 120; i++) {
         fc1_bias[i] = 0;
         for (int p = 0; p < 10; p++) {
-            fc1_bias[i] += aggregated_weights[p][5][i];
+            fc1_bias[i] += ((float*)aggregated_weights[p][5])[i];
         }
-        fc1_bias /= 10;
+        fc1_bias[i] /= 10;
         json_array_append(fc1_bias_first_layer, json_real(fc1_bias[i]));
     }
-    result[5] = fc1_bias;
     json_object_set(root, "fc1.bias", fc1_bias_first_layer);
 
     float fc2_weight[84][120];
@@ -265,14 +272,13 @@ void** average_weights() {
         for (int j = 0; j < 120; j++) {
             fc2_weight[i][j] = 0;
             for (int p = 0; p < 10; p++) {
-                fc2_weight[i][j] += aggregated_weights[p][6][i][j];
+                fc2_weight[i][j] += ((float**)aggregated_weights[p][6])[i][j];
             }
             fc2_weight[i][j] /= 10;
             json_array_append(fc2_weight_second_layer, json_real(fc2_weight[i][j]));
         }
         json_array_append(fc2_weight_first_layer, fc2_weight_second_layer);
     }
-    result[6] = fc2_weight;
     json_object_set(root, "fc2.weight", fc2_weight_first_layer);
 
 
@@ -282,12 +288,11 @@ void** average_weights() {
     for (int i = 0; i < 84; i++) {
         fc2_bias[i] = 0;
         for (int p = 0; p < 10; p++) {
-            fc2_bias[i] += aggregated_weights[p][7][i];
+            fc2_bias[i] += ((float*)aggregated_weights[p][7])[i];
         }
         fc2_bias[i] /= 10;
         json_array_append(fc2_bias_first_layer, json_real(fc2_bias[i]));
     }
-    result[7] = fc2_bias;
     json_object_set(root, "fc2.bias", fc2_bias_first_layer);
 
     float fc3_weight[10][84];
@@ -298,34 +303,36 @@ void** average_weights() {
         for (int j = 0; j < 84; j++) {
             fc3_weight[i][j] = 0;
             for (int p = 0; p < 10; p++) {
-                fc3_weight[i][j] += aggregated_weights[p][8][i][j];
+                fc3_weight[i][j] += ((float**)aggregated_weights[p][8])[i][j];
             }
             fc3_weight[i][j] /= 10;
             json_array_append(fc3_weight_second_layer, json_real(fc3_weight[i][j]));
         }
         json_array_append(fc3_weight_first_layer, fc3_weight_second_layer);
     }
-    result[8] = fc3_weight;
     json_object_set(root, "fc3.weight", fc3_weight_first_layer);
 
     float fc3_bias[10];
     json_t* fc3_bias_first_layer = json_array();
     for (int i = 0; i < 10; i++) {
+        fc3_bias[i] = 0;
         for (int p = 0; p < 10; p++) {
-            fc3_bias[i] += aggregated_weights[p][9][i];
+            fc3_bias[i] += ((float*)aggregated_weights[p][9])[i];
         }
+        fc3_bias[i] /= 10;
         json_array_append(fc3_bias_first_layer, json_real(fc3_bias[i]));
     }
-    result[9] = fc3_bias;
     json_object_set(root, "fc3.bias", fc3_bias_first_layer);
 
+    FILE *file = fopen("model_weights/shared_weights", "w");
+    // Dump the JSON object to the file
+    json_dumpf(root, file, JSON_ENSURE_ASCII);
+    // Close the file and free the JSON object
+    fclose(file);
+    json_decref(root);
 }
 
 int main() {
-    void** result = read_weights("model_weights/shared_weights");
-    float* fc3_bias = (float*)result[9];
-    for (int i = 0; i < 10; i++) {
-        printf("%f\n", fc3_bias[i]);
-    }
+    average_weights();
     return 0;
 }
