@@ -2,6 +2,9 @@ import argparse
 import json
 from torch.utils.data import Dataset, DataLoader
 from model import DistributedModel
+from weight_saver import WeightSaver
+from torchvision import transforms
+from torchvision.transforms.functional import to_tensor
 import torch
 
 
@@ -10,7 +13,11 @@ class LabelLimitedDataset(Dataset):
         self.data = data
 
     def __getitem__(self, idx):
-        return self.data[idx]
+        sample, label = self.data[idx]
+        sample_tensor = torch.tensor(sample)
+        return sample_tensor, label
+        # return self.data[idx]
+
 
     def __len__(self):
         return len(self.data)
@@ -54,6 +61,9 @@ def main():
     loss_fn = torch.nn.CrossEntropyLoss()
     optimizer = torch.optim.Adam(model.parameters(), lr=0.001)
     train(model, loss_fn, optimizer, data_loader)
+    # saver = WeightSaver(model)
+    # saver.save_calculated_weights()
+
 
 
 
