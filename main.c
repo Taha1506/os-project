@@ -135,31 +135,142 @@ void** read_weights(const char* path) {
 
 void** average_weights() {
     void*** aggregated_weights[10];
-    void** result[10]
     for (int i = 0; i < 10; i++) {
         char* path[100];
         path = "model_weights/weights"
         sprintf(path, "%s%d", path, i);
         aggregated_weights[i] = read_weights(path);
     }
+    json_t *root = json_object();
 
     float conv1_weight[6][3][5][5];
+    json_t* first_layer = json_array();
     for (int i = 0; i < 6; i++) {
+        json_t* second_layer = json_array();
         for (int j = 0; j < 3; j++) {
+            json_t third_layer = json_array();
+            for (int k = 0; k < 5; k++) {
+                json_t forth_layer = json_array()
+                for (int r = 0; r < 5; r++) {
+                    conv1_weight[i][j][k][r] = 0;
+                    for (int p = 0; p < 10; p++) {
+                        conv1_weight[i][j][k][r] += aggregated_weights[p][0][i][j][k][r];
+                    }
+                    conv1_weight[i][j][k][r] /= 10;
+                    json_array_append(forth_layer, json_real(conv1_weight[i][j][k][r]));
+                }
+                json_array_append(third_layer, forth_layer);
+            }
+            json_array_append(second_layer, third_layer);
+        }
+        json_array_append(first_layer, second_layer)
+    }
+    result[0] = conv1_weight;
+    json_object_set(root, "conv1.weight", first_layer);
+
+    float conv1_bias[6];
+    for (int i = 0; i < 6; i++) {
+        conv1_bias[i] = 0;
+        for (int p = 0; p < 10; p++) {
+            conv1_bias[i] += aggregated_weights[p][1][i];
+        }
+        conv1_bias[i] /= 10
+    }
+    result[1] = conv1_bias;
+
+    float conv2_weight[16][6][5][5];
+    for (int i = 0; i < 16; i++) {
+        for (int j = 0; j < 6; j++) {
             for (int k = 0; k < 5; k++) {
                 for (int r = 0; r < 5; r++) {
-                conv1_weight[i][j][k][r] = 0;
+                    conv2_weight[i][j][k][r] = 0;
                     for (int p = 0; p < 10; p++) {
-                        conv1_weight[i][j][k][r] += aggregated_weights[0][i][j][k][r];
+                        conv2_weight[i][j][k][r] += aggregated_weights[p][2][i][j][k][r];
                     }
+                    conv2_weight[i][j][k][r] /= 10;
                 }
-                conv1_weight[i][j][k][r] /= 10;
             }
         }
     }
-    result[0] = conv1_weight;
+    result[2] = conv2_weight;
 
 
+    float conv2_bias[16];
+    for (int i = 0; i < 16; i++) {
+        conv2_bias[i] = 0;
+        for (int p = 0; p < 10; p++) {
+            conv2_bias[i] += aggregated_weights[p][3][i];
+        }
+        conv2_bias[i] /= 10;
+    }
+    result[3] = conv2_bias;
+
+
+    float fc1_weight[120][400];
+    for (int i = 0; i < 120; i++) {
+        for (int j = 0; j < 400; j++) {
+            fc1_weight[i][j] = 0;
+            for (int p = 0; p < 10; p++) {
+                fc1_weight[i][j] += aggregated_weights[p][4][i][j];
+            }
+            fc1_weight[i][j] /= 10;
+        }
+    }
+    result[4] = fc1_weight;
+
+
+    float fc1_bias[120];
+    for (int i = 0; i < 120; i++) {
+        fc1_bias[i] = 0;
+        for (int p = 0; p < 10; p++) {
+            fc1_bias[i] += aggregated_weights[p][5][i];
+        }
+        fc1_bias /= 10;
+    }
+    result[5] = fc1_bias;
+
+    float fc2_weight[84][120];
+    for (int i = 0; i < 84; i++) {
+        for (int j = 0; j < 120; j++) {
+            fc2_weight[i][j] = 0;
+            for (int p = 0; p < 10; p++) {
+                fc2_weight[i][j] += aggregated_weights[p][6][i][j];
+            }
+            fc2_weight[i][j] /= 10;
+        }
+    }
+    result[6] = fc2_weight;
+
+
+    float fc2_bias[84];
+    for (int i = 0; i < 84; i++) {
+        fc2_bias[i] = 0;
+        for (int p = 0; p < 10; p++) {
+            fc2_bias[i] += aggregated_weights[p][7][i];
+        }
+        fc2_bias[i] /= 10;
+    }
+    result[7] = fc2_bias;
+
+    float fc3_weight[10][84];
+    for (int i = 0; i < 10; i++) {
+        for (int j = 0; j < 84; j++) {
+            fc3_weight[i][j] = 0;
+            for (int p = 0; p < 10; p++) {
+                fc3_weight[i][j] += aggregated_weights[p][8][i][j];
+            }
+            fc3_weight[i][j] /= 10;
+        }
+    }
+    result[8] = fc3_weight;
+
+    float fc3_bias[10];
+    for (int i = 0; i < 10; i++) {
+        for (int p = 0; p < 10; p++) {
+            fc3_bias[i] += aggregated_weights[p][9][i];
+        }
+    }
+    result[9] = fc3_bias;
 
 }
 
