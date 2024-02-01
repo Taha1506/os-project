@@ -163,114 +163,161 @@ void** average_weights() {
             }
             json_array_append(second_layer, third_layer);
         }
-        json_array_append(first_layer, second_layer)
+        json_array_append(first_layer, second_layer);
     }
     result[0] = conv1_weight;
     json_object_set(root, "conv1.weight", first_layer);
 
     float conv1_bias[6];
+    json_t* conv1_bias_first_layer = json_array();
     for (int i = 0; i < 6; i++) {
         conv1_bias[i] = 0;
         for (int p = 0; p < 10; p++) {
             conv1_bias[i] += aggregated_weights[p][1][i];
         }
         conv1_bias[i] /= 10
+        json_array_append(conv1_bias_first_layer, json_real(conv1_bias[i]));
     }
+
     result[1] = conv1_bias;
+    json_object_set(root, "conv1.bias", conv1_bias_first_layer);
 
     float conv2_weight[16][6][5][5];
+    json_t* conv2_weight_first_layer = json_array();
     for (int i = 0; i < 16; i++) {
+        json_t* conv2_weight_second_layer = json_array();
         for (int j = 0; j < 6; j++) {
+            json_t* conv2_weight_third_layer = json_array();
             for (int k = 0; k < 5; k++) {
+                json_t* conv2_weight_forth_layer = json_array();
                 for (int r = 0; r < 5; r++) {
                     conv2_weight[i][j][k][r] = 0;
                     for (int p = 0; p < 10; p++) {
                         conv2_weight[i][j][k][r] += aggregated_weights[p][2][i][j][k][r];
                     }
                     conv2_weight[i][j][k][r] /= 10;
+                    json_array_append(conv2_weight_forth_layer, json_real(conv2_weight[i][j][k][r]));
                 }
+                json_array_append(conv2_weight_third_layer, conv2_weight_forth_layer);
+
             }
+            json_array_append(conv2_weight_second_layer, conv2_weight_third_layer);
+
         }
+        json_array_append(conv2_weight_first_layer, conv2_weight_second_layer);
+
     }
     result[2] = conv2_weight;
+    json_object_set(root, "conv2.weight", conv2_weight_first_layer);
 
 
     float conv2_bias[16];
+    json_t* conv2_bias_first_layer = json_array();
     for (int i = 0; i < 16; i++) {
         conv2_bias[i] = 0;
         for (int p = 0; p < 10; p++) {
             conv2_bias[i] += aggregated_weights[p][3][i];
         }
         conv2_bias[i] /= 10;
+        json_array_append(conv2_bias_first_layer, json_real(conv2_bias[i]));
     }
     result[3] = conv2_bias;
+    json_object_set(root, "conv2.bias", conv2_bias_first_layer);
 
 
     float fc1_weight[120][400];
+    json_t* fc1_weight_first_layer = json_array();
     for (int i = 0; i < 120; i++) {
+        json_t* fc1_weight_second_layer = json_array();
         for (int j = 0; j < 400; j++) {
             fc1_weight[i][j] = 0;
             for (int p = 0; p < 10; p++) {
                 fc1_weight[i][j] += aggregated_weights[p][4][i][j];
             }
             fc1_weight[i][j] /= 10;
+            json_array_append(fc1_weight_second_layer, json_real(fc1_weight[i][j]));
         }
+        json_array_append(fc1_weight_first_layer, fc1_weight_second_layer)
     }
     result[4] = fc1_weight;
+    json_object_set(root, "fc1.weight", fc1_weight_first_layer);
 
 
     float fc1_bias[120];
+    json_t* fc1_bias_first_layer = json_array();
+
     for (int i = 0; i < 120; i++) {
         fc1_bias[i] = 0;
         for (int p = 0; p < 10; p++) {
             fc1_bias[i] += aggregated_weights[p][5][i];
         }
         fc1_bias /= 10;
+        json_array_append(fc1_bias_first_layer, json_real(fc1_bias[i]));
     }
     result[5] = fc1_bias;
+    json_object_set(root, "fc1.bias", fc1_bias_first_layer);
 
     float fc2_weight[84][120];
+    json_t* fc2_weight_first_layer = json_array();
+
     for (int i = 0; i < 84; i++) {
+        json_t* fc2_weight_second_layer = json_array();
         for (int j = 0; j < 120; j++) {
             fc2_weight[i][j] = 0;
             for (int p = 0; p < 10; p++) {
                 fc2_weight[i][j] += aggregated_weights[p][6][i][j];
             }
             fc2_weight[i][j] /= 10;
+            json_array_append(fc2_weight_second_layer, json_real(fc2_weight[i][j]));
         }
+        json_array_append(fc2_weight_first_layer, fc2_weight_second_layer);
     }
     result[6] = fc2_weight;
+    json_object_set(root, "fc2.weight", fc2_weight_first_layer);
 
 
     float fc2_bias[84];
+    json_t* fc2_bias_first_layer = json_array();
+
     for (int i = 0; i < 84; i++) {
         fc2_bias[i] = 0;
         for (int p = 0; p < 10; p++) {
             fc2_bias[i] += aggregated_weights[p][7][i];
         }
         fc2_bias[i] /= 10;
+        json_array_append(fc2_bias_first_layer, json_real(fc2_bias[i]));
     }
     result[7] = fc2_bias;
+    json_object_set(root, "fc2.bias", fc2_bias_first_layer);
 
     float fc3_weight[10][84];
+    json_t* fc3_weight_first_layer = json_array();
+
     for (int i = 0; i < 10; i++) {
+        json_t* fc3_weight_second_layer = json_array();
         for (int j = 0; j < 84; j++) {
             fc3_weight[i][j] = 0;
             for (int p = 0; p < 10; p++) {
                 fc3_weight[i][j] += aggregated_weights[p][8][i][j];
             }
             fc3_weight[i][j] /= 10;
+            json_array_append(fc3_weight_second_layer, json_real(fc3_weight[i][j]));
         }
+        json_array_append(fc3_weight_first_layer, fc3_weight_second_layer);
     }
     result[8] = fc3_weight;
+    json_object_set(root, "fc3.weight", fc3_weight_first_layer);
 
     float fc3_bias[10];
+    json_t* fc3_bias_first_layer = json_array();
     for (int i = 0; i < 10; i++) {
         for (int p = 0; p < 10; p++) {
             fc3_bias[i] += aggregated_weights[p][9][i];
         }
+        json_array_append(fc3_bias_first_layer, json_real(fc3_bias[i]));
     }
     result[9] = fc3_bias;
+    json_object_set(root, "fc3.bias", fc3_bias_first_layer);
 
 }
 
