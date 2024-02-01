@@ -1,10 +1,7 @@
 import argparse
 import json
 from torch.utils.data import Dataset, DataLoader
-from model import DistributedModel
-from weight_saver import WeightSaver
-from torchvision import transforms
-from torchvision.transforms.functional import to_tensor
+from saver_and_loader import save_weights, load_model
 import torch
 import numpy as np
 
@@ -15,9 +12,7 @@ class LabelLimitedDataset(Dataset):
         self.y = y
 
     def __getitem__(self, idx):
-        sample, label = self.data[idx]
-        sample_tensor = torch.tensor(sample)
-        return sample_tensor, label
+        return self.X[idx], self.y[idx]
 
     def __len__(self):
         return len(self.y)
@@ -31,14 +26,6 @@ def read_data(labels):
             targets = [label] * len(features)
             data.extend(list(zip(features, targets)))
     return np.array([sample[0] for sample in data], dtype=np.float32), np.array([sample[1] for sample in data])
-
-
-def get_model():
-    model = DistributedModel()
-    with open('model_weights/shared_weights.txt') as f:
-        loaded_state_dict = json.load(f)
-    model.load_state_dict({param_tensor: torch.tensor(values) for param_tensor, values in loaded_state_dict.items()})
-    return model
 
 
 def train(model, loss_fn, optimizer, data_loader):
@@ -60,12 +47,11 @@ def main():
     X, y = read_data(labels)
     dataset = LabelLimitedDataset(X, y)
     data_loader = DataLoader(dataset)
-    model = get_model()
+    model = load_model('model_weights/shared_weights')
     loss_fn = torch.nn.CrossEntropyLoss()
     optimizer = torch.optim.Adam(model.parameters(), lr=0.001)
     train(model, loss_fn, optimizer, data_loader)
-    # saver = WeightSaver(model)
-    # saver.save_calculated_weights()
+    save_weights(model, f'model_weights/weights{process_number}')
 
 
 
