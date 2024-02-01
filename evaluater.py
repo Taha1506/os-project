@@ -17,7 +17,11 @@ def evaluate_accuracy(model, data_loader):
 
 def main():
     model = load_model('model_weights/shared_weights')
-    test_data = CIFAR10(root='./data/test', train=True, transform=ToTensor(), download=True)
+    train_data = CIFAR10(root='./data/test', train=True, transform=ToTensor(), download=True)
+    train_loader = DataLoader(train_data)
+    train_accuracy = evaluate_accuracy(model, train_loader)
+    print(f"Accuracy on train data is equal to: {train_accuracy}")
+    test_data = CIFAR10(root='./data/test', train=False, transform=ToTensor(), download=True)
     test_loader = DataLoader(test_data)
     test_accuracy = evaluate_accuracy(model, test_loader)
     print(f"Accuracy on test data is equal to: {test_accuracy}")

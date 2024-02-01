@@ -2,6 +2,8 @@
 #include <stdlib.h>
 #include <string.h>
 #include <jansson.h>
+#include <sys/wait.h>
+#include <unistd.h>
 
 void execute(const char* path) {
     char scriptContent[200] = "#!/bin/bash\n python ";
@@ -325,14 +327,31 @@ void average_weights() {
     json_object_set(root, "fc3.bias", fc3_bias_first_layer);
 
     FILE *file = fopen("model_weights/shared_weights", "w");
-    // Dump the JSON object to the file
     json_dumpf(root, file, JSON_ENSURE_ASCII);
-    // Close the file and free the JSON object
     fclose(file);
     json_decref(root);
 }
 
 int main() {
-    average_weights();
+    execute("download_data.py");
+    execute("initialize_weights.py");
+    int EPOCHS = 5;
+    for (int epoch = 0; epoch < EPOCHS; epoch++) {
+        for (int i = 0; i < 10; i++) {
+            int id = fork();
+            if (id == 0) {
+                char command[100];
+                strcpy(command, "trainer.py --process_number");
+                sprintf(command, "%s %d", command, i);
+                execute(command);
+                printf("PROCESS %d FINISHED\n", i);
+                exit(0);
+            } else {
+                wait(NULL);
+            }
+        }
+        average_weights();
+        execute("evaluater.py");
+    }
     return 0;
 }
