@@ -46,7 +46,7 @@ def main():
     labels = [process_number % 10, (process_number + 1) % 10, (process_number + 2) % 10]
     X, y = read_data(labels)
     dataset = LabelLimitedDataset(X, y)
-    data_loader = DataLoader(dataset)
+    data_loader = DataLoader(dataset, shuffle=True)
     model = load_model('model_weights/shared_weights')
     loss_fn = torch.nn.CrossEntropyLoss()
     optimizer = torch.optim.Adam(model.parameters(), lr=0.001)
